@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CapiterTask</string>
+    <string name="add_to_cart">أضف الى السلة</string>
+    <string name="products">المنتجات</string>
+    <string name="cart">السلة</string>
+    <string name="order_now">كد الطلب</string>
+    <string name="back_home">العودة الى الصفحة الرئيسية</string>
+    <string name="ordered_cart">تم تأكيد طلبك</string>
+</resources>
