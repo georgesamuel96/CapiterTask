@@ -17,7 +17,7 @@ class ProductsAdapter(
     private val isCartView: Boolean,
     private val addToCartListener: (ProductDetails, Int) -> Unit,
     private val listRefreshedWithZeroCounts: (() -> Unit)?
-    ): RecyclerView.Adapter<ProductsAdapter.ProductsViewHolder>() {
+) : RecyclerView.Adapter<ProductsAdapter.ProductsViewHolder>() {
 
     private val list: MutableList<ProductDetails> = ArrayList()
     private var setCountsZero = false
@@ -43,27 +43,27 @@ class ProductsAdapter(
 
     override fun getItemCount(): Int = list.size
 
-    fun clear(){
+    fun clear() {
         this.list.clear()
         this.notifyDataSetChanged()
     }
 
-    fun addNewList(newList: List<ProductDetails>){
+    fun addNewList(newList: List<ProductDetails>) {
         newList.forEach {
             addProduct(it)
         }
     }
 
-    private fun addProduct(product: ProductDetails){
+    private fun addProduct(product: ProductDetails) {
         this.list.add(product)
         this.notifyItemInserted(list.size - 1)
     }
 
-    fun updateProductAt(position: Int){
+    fun updateProductAt(position: Int) {
         this.notifyItemChanged(position)
     }
 
-    fun removeProductAt(position: Int){
+    fun removeProductAt(position: Int) {
         this.list.removeAt(position)
         this.notifyItemRemoved(position)
         this.notifyItemRangeChanged(position, this.list.size)
@@ -71,16 +71,16 @@ class ProductsAdapter(
 
     fun getProducts() = this.list
 
-    fun clearProductCount(){
+    fun clearProductCount() {
         setCountsZero = true
         this.notifyDataSetChanged()
     }
 
-    fun resetCountsZero(){
+    fun resetCountsZero() {
         this.setCountsZero = false
     }
 
-    class ProductsViewHolder(view: View): RecyclerView.ViewHolder(view){
+    class ProductsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         private val imgProduct = view.findViewById<ImageView>(R.id.imgProduct)
         private val btnRemove = view.findViewById<ImageView>(R.id.btnRemove)
@@ -98,28 +98,25 @@ class ProductsAdapter(
             setCountsZero: Boolean,
             addToCartListener: (ProductDetails, Int) -> Unit,
             listRefreshedWithZeroCounts: (() -> Unit)?
-        ){
-            btnRemove.visibility = View.GONE
-            btnAddToCart.visibility = View.GONE
-            if(isCartView){
-                btnRemove.visibility = View.VISIBLE
-                btnAddToCart.visibility = View.GONE
-            } else {
-                btnRemove.visibility = View.GONE
-                btnAddToCart.visibility = View.VISIBLE
-            }
-            Glide.with(context).load(product.imageUrl).fitCenter().into(imgProduct)
-            tvProductName.text = product.name
-            tvProductPrice.text = "${product.price}"
+        ) {
 
-            if(setCountsZero) {
-                product.count = 0
-                if (isLastPosition)
-                    listRefreshedWithZeroCounts?.invoke()
-            }
+            setView(
+                context,
+                product,
+                isLastPosition,
+                isCartView,
+                setCountsZero,
+                listRefreshedWithZeroCounts
+            )
 
-            tvCartCount.text = "${product.count}"
+            setListeners(product, position, addToCartListener)
+        }
 
+        private fun setListeners(
+            product: ProductDetails,
+            position: Int,
+            addToCartListener: (ProductDetails, Int) -> Unit
+        ) {
             btnAddToCart.setOnClickListener {
                 product.count++
                 addToCartListener(product, position)
@@ -128,6 +125,36 @@ class ProductsAdapter(
             btnRemove.setOnClickListener {
                 addToCartListener(product, position)
             }
+        }
+
+        private fun setView(
+            context: Context,
+            product: ProductDetails,
+            isLastPosition: Boolean,
+            isCartView: Boolean,
+            setCountsZero: Boolean,
+            listRefreshedWithZeroCounts: (() -> Unit)?
+        ) {
+            btnRemove.visibility = View.GONE
+            btnAddToCart.visibility = View.GONE
+            if (isCartView) {
+                btnRemove.visibility = View.VISIBLE
+                btnAddToCart.visibility = View.GONE
+            } else {
+                btnRemove.visibility = View.GONE
+                btnAddToCart.visibility = View.VISIBLE
+            }
+            Glide.with(context).load(product.imageUrl).fitCenter().into(imgProduct)
+            tvProductName.text = product.name
+            tvProductPrice.text = "${product.price} ${context.getString(R.string.pound)}"
+
+            if (setCountsZero) {
+                product.count = 0
+                if (isLastPosition)
+                    listRefreshedWithZeroCounts?.invoke()
+            }
+
+            tvCartCount.text = "${product.count}"
         }
     }
 }

@@ -4,7 +4,9 @@
     <string name="add_to_cart">أضف الى السلة</string>
     <string name="products">المنتجات</string>
     <string name="cart">السلة</string>
-    <string name="order_now">كد الطلب</string>
+    <string name="order_now">أكد الطلب</string>
     <string name="back_home">العودة الى الصفحة الرئيسية</string>
     <string name="ordered_cart">تم تأكيد طلبك</string>
+    <string name="pound">جنيه</string>
+    <string name="orders_name">أسم الطلب</string>
 </resources>
