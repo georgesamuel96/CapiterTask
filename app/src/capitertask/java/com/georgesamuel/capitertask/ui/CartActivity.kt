@@ -84,6 +84,7 @@ class CartActivity : AppCompatActivity() {
                     btnBack.visibility = View.VISIBLE
                     deleteCart()
                     etOrderName.setText("")
+                    etOrderName.visibility = View.GONE
                     refreshHome = true
                 } else {
                     tvCart.visibility = View.GONE
