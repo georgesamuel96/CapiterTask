@@ -9,10 +9,11 @@ import com.georgesamuel.capitertask.model.PageNumberQuery
 import com.georgesamuel.capitertask.model.ProductDetails
 import com.georgesamuel.capitertask.usecases.*
 import io.reactivex.Completable
-import io.reactivex.Maybe
+import io.reactivex.Single
+import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Action
+import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.observers.DisposableObserver
@@ -25,7 +26,8 @@ class AppViewModel(
     private val removeProductCartUseCase: RemoveProductCartUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
-    private val getProductFromLocalUseCase: GetProductFromLocalUseCase
+    private val getProductFromLocalUseCase: GetProductFromLocalUseCase,
+    private val getOrdersUseCase: GetOrdersUseCase
 ) : ViewModel() {
 
     private val TAG = AppViewModel::class.java.simpleName
@@ -46,11 +48,20 @@ class AppViewModel(
 
     private val cartProducts = MutableLiveData<List<ProductDetails>>()
     val cartProductsLiveData: LiveData<List<ProductDetails>>
-    get() = cartProducts
+        get() = cartProducts
 
     private val successfulCreatedOrder = MutableLiveData<Boolean>()
     val successfulCreatedOrderLiveData: LiveData<Boolean>
-    get() = successfulCreatedOrder
+        get() = successfulCreatedOrder
+
+    private val ordersData = mutableListOf<OrderRequest>()
+    private val ordersList = MutableLiveData<List<OrderRequest>>()
+    val ordersLiveData: LiveData<List<OrderRequest>>
+        get() = ordersList
+
+    private val groupedOrdersList = MutableLiveData<List<OrderRequest>>()
+    val groupedOrdersLiveData: LiveData<List<OrderRequest>>
+    get() = groupedOrdersList
 
     var addToCartProductPosition = -1
     var removeFromCartPosition = -1
@@ -143,12 +154,21 @@ class AppViewModel(
         )
     }
 
-    fun orderNow(productsList: List<ProductDetails>, orderName: String){
-        if(orderName.isEmpty())
+    fun orderNow(productsList: List<ProductDetails>, orderName: String) {
+        if (orderName.isEmpty())
             return
         val newList = mutableListOf<OrderRequest>()
         productsList.forEach {
-            newList.add(OrderRequest(it.id, orderName, it.imageUrl, it.name, it.price, it.count))
+            newList.add(
+                OrderRequest(
+                    productId = it.id,
+                    productName = it.name,
+                    productImageUrl = it.imageUrl,
+                    orderName = orderName,
+                    productPrice = it.price,
+                    productQuantity = it.count
+                )
+            )
         }
 
         val observableList =
@@ -175,7 +195,66 @@ class AppViewModel(
 
     }
 
-    fun deleteCart(){
+    fun getOrders() {
+        val observableList =
+            getOrdersUseCase.execute()
+
+        compositeDisposable.add(
+            observableList
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableObserver<List<OrderRequest>>() {
+                    override fun onNext(t: List<OrderRequest>) {
+                        ordersData.clear()
+                        ordersData.addAll(t)
+                    }
+
+                    override fun onError(e: Throwable) {
+                    }
+
+                    override fun onComplete() {
+                        ordersList.value = ordersData
+                    }
+
+
+                })
+        )
+    }
+
+    private fun groupOrdersList(orders: List<OrderRequest>): List<OrderRequest>{
+        var lastOrderName = ""
+        val newList = mutableListOf<OrderRequest>()
+
+        orders.forEach {
+            if(it.orderName != lastOrderName) {
+                newList.add(OrderRequest("", orderName = it.orderName))
+                lastOrderName = it.orderName
+            }
+            newList.add(it)
+        }
+        return newList
+    }
+
+    fun updateOrdersListWithGrouping(orders: List<OrderRequest>) {
+        compositeDisposable.add(
+            Single.fromCallable {
+                groupOrdersList(orders)
+            }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Consumer<List<OrderRequest>> {
+                    override fun accept(t: List<OrderRequest>?) {
+                        groupedOrdersList.value = t?: ArrayList()
+                    }
+                })
+        )
+    }
+
+    private fun doTask() {
+
+    }
+
+    fun deleteCart() {
 
         Completable.fromAction { deleteCartUseCase.execute() }
             .subscribeOn(Schedulers.io())

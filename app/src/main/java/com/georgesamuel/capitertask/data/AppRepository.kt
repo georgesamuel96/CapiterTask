@@ -9,4 +9,6 @@ interface AppRepository {
     fun getProducts(pageNumber: String): Observable<List<ProductDetails>>
 
     fun orderNow(list: List<OrderRequest>): Observable<Unit>
+
+    fun getOrders(): Observable<List<OrderRequest>>
 }

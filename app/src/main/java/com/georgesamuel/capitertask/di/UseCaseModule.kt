@@ -25,6 +25,12 @@ class UseCaseModule {
 
     @Singleton
     @Provides
+    fun providesGetOrdersUseCase(appRepository: AppRepository): GetOrdersUseCase{
+        return GetOrdersUseCase(appRepository)
+    }
+
+    @Singleton
+    @Provides
     fun providesAddToCartUseCase(localDataSource: LocalDataSource): AddToCartUseCase{
         return AddToCartUseCase(localDataSource)
     }

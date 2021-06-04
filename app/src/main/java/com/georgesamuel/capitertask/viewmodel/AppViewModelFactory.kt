@@ -11,7 +11,8 @@ class AppViewModelFactory(
     private val removeProductCartUseCase: RemoveProductCartUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
-    private val getProductFromLocalUseCase: GetProductFromLocalUseCase
+    private val getProductFromLocalUseCase: GetProductFromLocalUseCase,
+    private val getOrdersUseCase: GetOrdersUseCase
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return AppViewModel(
@@ -21,7 +22,8 @@ class AppViewModelFactory(
             removeProductCartUseCase,
             createOrderUseCase,
             deleteCartUseCase,
-            getProductFromLocalUseCase
+            getProductFromLocalUseCase,
+            getOrdersUseCase
         ) as T
     }
 }

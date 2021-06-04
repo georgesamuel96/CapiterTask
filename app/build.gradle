@@ -35,6 +35,28 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    flavorDimensions 'version'
+    productFlavors {
+        capitertask {
+            dimension 'version'
+        }
+        capiterdelivery {
+            dimension 'version'
+            applicationId 'caom.georgesamuel.capiterdelivery'
+        }
+    }
+    sourceSets {
+        capitertask {
+            java {
+                srcDirs 'src\\capitertask\\java'
+            }
+        }
+        capiterdelivery {
+            java {
+                srcDirs 'src\\capiterdelivery\\java'
+            }
+        }
+    }
 }
 
 dependencies {

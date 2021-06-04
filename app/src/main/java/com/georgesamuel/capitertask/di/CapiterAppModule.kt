@@ -16,7 +16,8 @@ class CapiterAppModule {
         removeProductCartUseCase: RemoveProductCartUseCase,
         createOrderUseCase: CreateOrderUseCase,
         deleteCartUseCase: DeleteCartUseCase,
-        getProductFromLocalUseCase: GetProductFromLocalUseCase
+        getProductFromLocalUseCase: GetProductFromLocalUseCase,
+        getOrdersUseCase: GetOrdersUseCase
     ): AppViewModelFactory {
         return AppViewModelFactory(
             getProductsUseCase,
@@ -25,7 +26,8 @@ class CapiterAppModule {
             removeProductCartUseCase,
             createOrderUseCase,
             deleteCartUseCase,
-            getProductFromLocalUseCase
+            getProductFromLocalUseCase,
+            getOrdersUseCase
         )
     }
 

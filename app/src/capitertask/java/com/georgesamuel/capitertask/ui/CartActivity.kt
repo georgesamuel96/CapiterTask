@@ -16,7 +16,7 @@ import com.georgesamuel.capitertask.di.Injector
 import com.georgesamuel.capitertask.model.ProductDetails
 import com.georgesamuel.capitertask.viewmodel.AppViewModel
 import com.georgesamuel.capitertask.viewmodel.AppViewModelFactory
-import kotlinx.android.synthetic.main.activity_cart.*
+import kotlinx.android.synthetic.capitertask.activity_cart.*
 import javax.inject.Inject
 
 class CartActivity : AppCompatActivity() {

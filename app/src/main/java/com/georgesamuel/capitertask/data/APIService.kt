@@ -15,4 +15,7 @@ interface APIService {
 
     @POST("orders")
     fun orderNow(@Body order: List<OrderRequest>): Observable<Unit>
+
+    @GET("orders")
+    fun getOrders(): Observable<List<OrderRequest>>
 }

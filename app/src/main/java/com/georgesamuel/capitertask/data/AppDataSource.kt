@@ -9,4 +9,6 @@ class AppDataSource(private val apiService: APIService): AppRepository {
     override fun getProducts(pageNumber: String): Observable<List<ProductDetails>> = apiService.getProducts(pageNumber)
 
     override fun orderNow(list: List<OrderRequest>) = apiService.orderNow(list)
+
+    override fun getOrders() =  apiService.getOrders()
 }
