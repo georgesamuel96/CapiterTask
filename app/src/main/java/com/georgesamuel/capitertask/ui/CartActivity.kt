@@ -96,7 +96,7 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun removeFromCartListener(productDetails: ProductDetails, position: Int){
-        appViewModel.removeFromCart(productDetails, position)
+        appViewModel.removeProductFromCart(productDetails, position)
     }
 
     private fun initList() {

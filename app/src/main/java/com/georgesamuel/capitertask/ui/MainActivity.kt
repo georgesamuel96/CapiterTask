@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         (application as Injector).createAppSubComponent().inject(this)
 
-        appViewModel.getProducts(1, mapOf())
+        appViewModel.getProductsFromServer(1)
 
         initList()
         observeViewModel()
@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addToCartListener(productDetails: ProductDetails, position: Int){
-        appViewModel.addToCart(productDetails, position)
+        appViewModel.addProductToCart(productDetails, position)
     }
 
     private fun listRefreshedWithZeroCounts(){

@@ -55,7 +55,7 @@ class AppViewModel(
     var addToCartProductPosition = -1
     var removeFromCartPosition = -1
 
-    fun getProducts(pageNumber: Int, cartItems: Map<String, Int>) {
+    fun getProductsFromServer(pageNumber: Int) {
         productsMutableList.clear()
         val observableList =
             getProductsUseCase.execute(PageNumberQuery(pageNumber).toString())
@@ -88,7 +88,7 @@ class AppViewModel(
         )
     }
 
-    fun addToCart(productDetails: ProductDetails, position: Int) {
+    fun addProductToCart(productDetails: ProductDetails, position: Int) {
         addToCartProductPosition = position
         val observable = addToCartUseCase.execute(productDetails)
 
@@ -108,7 +108,7 @@ class AppViewModel(
         )
     }
 
-    fun removeFromCart(productDetails: ProductDetails, position: Int) {
+    fun removeProductFromCart(productDetails: ProductDetails, position: Int) {
         removeFromCartPosition = position
         val observable = removeProductCartUseCase.execute(productDetails)
 
@@ -182,12 +182,6 @@ class AppViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
             }
-    }
-
-    private fun getCartAsMap(list: List<ProductDetails>): Map<String, Int>{
-        val map = mutableMapOf<String, Int>()
-        list.forEach { map[it.id] = it.count }
-        return map
     }
 
     fun clear() {
