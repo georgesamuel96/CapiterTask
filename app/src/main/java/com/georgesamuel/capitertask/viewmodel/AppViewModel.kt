@@ -24,7 +24,8 @@ class AppViewModel(
     private val getCartUseCase: GetCartUseCase,
     private val removeProductCartUseCase: RemoveProductCartUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
-    private val deleteCartUseCase: DeleteCartUseCase
+    private val deleteCartUseCase: DeleteCartUseCase,
+    private val getProductFromLocalUseCase: GetProductFromLocalUseCase
 ) : ViewModel() {
 
     private val TAG = AppViewModel::class.java.simpleName
@@ -61,13 +62,15 @@ class AppViewModel(
 
         compositeDisposable.add(
             observableList
-                .flatMapIterable { products -> products }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable { products ->
+                    products
+                }
                 .map { product ->
-                    product.count = cartItems[product.id] ?: 0
+                    product.count = getProductFromLocalUseCase.execute(product.id)
                     return@map product
                 }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableObserver<ProductDetails>() {
                     override fun onNext(product: ProductDetails) {
                         productsMutableList.add(product)

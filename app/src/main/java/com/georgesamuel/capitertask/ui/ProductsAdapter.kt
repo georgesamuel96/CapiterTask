@@ -1,7 +1,6 @@
 package com.georgesamuel.capitertask.ui
 
 import android.content.Context
-import android.util.MutableLong
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +15,12 @@ import com.google.android.material.button.MaterialButton
 class ProductsAdapter(
     private val context: Context,
     private val isCartView: Boolean,
-    private val addToCartListener: (ProductDetails, Int) -> Unit
+    private val addToCartListener: (ProductDetails, Int) -> Unit,
+    private val listRefreshedWithZeroCounts: (() -> Unit)?
     ): RecyclerView.Adapter<ProductsAdapter.ProductsViewHolder>() {
 
     private val list: MutableList<ProductDetails> = ArrayList()
+    private var setCountsZero = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductsViewHolder {
         return ProductsViewHolder(
@@ -29,9 +30,14 @@ class ProductsAdapter(
 
     override fun onBindViewHolder(holder: ProductsViewHolder, position: Int) {
         holder.bind(
-            context, list[position], position,
+            context,
+            list[position],
+            position,
+            position == this.list.size - 1,
             isCartView,
-            addToCartListener
+            setCountsZero,
+            addToCartListener,
+            listRefreshedWithZeroCounts
         )
     }
 
@@ -65,6 +71,15 @@ class ProductsAdapter(
 
     fun getProducts() = this.list
 
+    fun clearProductCount(){
+        setCountsZero = true
+        this.notifyDataSetChanged()
+    }
+
+    fun resetCountsZero(){
+        this.setCountsZero = false
+    }
+
     class ProductsViewHolder(view: View): RecyclerView.ViewHolder(view){
 
         private val imgProduct = view.findViewById<ImageView>(R.id.imgProduct)
@@ -78,8 +93,11 @@ class ProductsAdapter(
             context: Context,
             product: ProductDetails,
             position: Int,
+            isLastPosition: Boolean,
             isCartView: Boolean,
-            addToCartListener: (ProductDetails, Int) -> Unit
+            setCountsZero: Boolean,
+            addToCartListener: (ProductDetails, Int) -> Unit,
+            listRefreshedWithZeroCounts: (() -> Unit)?
         ){
             btnRemove.visibility = View.GONE
             btnAddToCart.visibility = View.GONE
@@ -93,6 +111,13 @@ class ProductsAdapter(
             Glide.with(context).load(product.imageUrl).fitCenter().into(imgProduct)
             tvProductName.text = product.name
             tvProductPrice.text = "${product.price}"
+
+            if(setCountsZero) {
+                product.count = 0
+                if (isLastPosition)
+                    listRefreshedWithZeroCounts?.invoke()
+            }
+
             tvCartCount.text = "${product.count}"
 
             btnAddToCart.setOnClickListener {

@@ -1,11 +1,13 @@
 package com.georgesamuel.capitertask.ui
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,11 +30,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val productsAdapter: ProductsAdapter by lazy {
-        ProductsAdapter(this@MainActivity, false) { product, position ->
-            addToCartListener(
-                product,
-                position
-            )
+        ProductsAdapter(
+            this@MainActivity,
+            false,
+            { product, position -> addToCartListener(product, position) }
+        ) { listRefreshedWithZeroCounts() }
+    }
+
+    private val startNewActivityWithResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.let {
+                val refreshList = it.getBooleanExtra(EXTRA_REFRESH_HOME, false)
+                if(refreshList)
+                    productsAdapter.clearProductCount()
+            }
         }
     }
 
@@ -70,6 +82,10 @@ class MainActivity : AppCompatActivity() {
         appViewModel.addToCart(productDetails, position)
     }
 
+    private fun listRefreshedWithZeroCounts(){
+        productsAdapter.resetCountsZero()
+    }
+
     private fun initList() {
         rvProducts.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         rvProducts.setHasFixedSize(true)
@@ -88,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.item_cart -> {
-                startActivity(Intent(this@MainActivity, CartActivity::class.java))
+                startNewActivityWithResult.launch(Intent(this@MainActivity, CartActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -99,5 +115,9 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
 
         appViewModel.clear()
+    }
+
+    companion object{
+        const val EXTRA_REFRESH_HOME = "EXTRA_REFRESH_HOME"
     }
 }

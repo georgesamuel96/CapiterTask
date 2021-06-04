@@ -12,7 +12,7 @@ class LocalDataSourceImpl(private val appDao: AppDao): LocalDataSource {
         return appDao.getProducts()
     }
 
-    override fun getProduct(id: String): Flowable<ProductDetails> {
+    override fun getProduct(id: String): Int {
         return appDao.getProduct(id)
     }
 

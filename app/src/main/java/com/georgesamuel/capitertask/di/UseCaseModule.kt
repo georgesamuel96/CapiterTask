@@ -46,4 +46,10 @@ class UseCaseModule {
     fun providesDeleteCartUseCaseUseCase(localDataSource: LocalDataSource): DeleteCartUseCase{
         return DeleteCartUseCase(localDataSource)
     }
+
+    @Singleton
+    @Provides
+    fun providesGetProductFromLocalUseCaseUseCase(localDataSource: LocalDataSource): GetProductFromLocalUseCase{
+        return GetProductFromLocalUseCase(localDataSource)
+    }
 }

@@ -1,11 +1,12 @@
 package com.georgesamuel.capitertask.ui
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,15 +27,15 @@ class CartActivity : AppCompatActivity() {
         ViewModelProvider(this, appViewModelFactory).get(AppViewModel::class.java)
     }
 
-    private lateinit var rootView: View
     private val productsAdapter: ProductsAdapter by lazy {
-        ProductsAdapter(this@CartActivity, true) { product, position ->
-            removeFromCartListener(
-                product,
-                position
-            )
-        }
+        ProductsAdapter(
+            this@CartActivity,
+            false,
+            { product, position -> removeFromCartListener(product, position) },
+            null
+        )
     }
+    private var refreshHome = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Utils.setLocale(this, "ar")
@@ -59,7 +60,7 @@ class CartActivity : AppCompatActivity() {
         }
 
         btnBack.setOnClickListener {
-            finish()
+            closeCartAndRefreshHome()
         }
     }
 
@@ -83,13 +84,13 @@ class CartActivity : AppCompatActivity() {
                     btnBack.visibility = View.VISIBLE
                     deleteCart()
                     etOrderName.setText("")
+                    refreshHome = true
                 } else {
                     tvCart.visibility = View.GONE
                     btnOrderNow.visibility = View.VISIBLE
                     btnBack.visibility = View.GONE
+                    refreshHome = false
                 }
-
-
             })
         }
     }
@@ -112,11 +113,18 @@ class CartActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.item_back -> {
-                finish()
+                closeCartAndRefreshHome()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun closeCartAndRefreshHome() {
+        val intent = Intent()
+        intent.putExtra(MainActivity.EXTRA_REFRESH_HOME, refreshHome)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     override fun onDestroy() {

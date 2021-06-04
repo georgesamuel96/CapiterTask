@@ -16,8 +16,8 @@ interface AppDao {
     @Query("SELECT * FROM ProductDetails")
     fun getProducts():Flowable<List<ProductDetails>>
 
-    @Query("SELECT * FROM ProductDetails WHERE id=:id")
-    fun getProduct(id: String):Flowable<ProductDetails>
+    @Query("SELECT count FROM ProductDetails WHERE id=:id")
+    fun getProduct(id: String): Int
 
     @Delete
     fun deleteProduct(productDetails: ProductDetails): Int

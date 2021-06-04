@@ -8,7 +8,7 @@ interface LocalDataSource {
 
     fun getProducts(): Flowable<List<ProductDetails>>
 
-    fun getProduct(id: String): Flowable<ProductDetails>
+    fun getProduct(id: String): Int
 
     fun deleteProduct(productDetails: ProductDetails): Int
 
