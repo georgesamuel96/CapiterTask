@@ -30,8 +30,9 @@ class CartActivity : AppCompatActivity() {
     private val productsAdapter: ProductsAdapter by lazy {
         ProductsAdapter(
             this@CartActivity,
-            false,
+            true,
             { product, position -> removeFromCartListener(product, position) },
+            null,
             null
         )
     }

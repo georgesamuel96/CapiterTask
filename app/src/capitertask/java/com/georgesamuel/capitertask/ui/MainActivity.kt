@@ -2,12 +2,12 @@ package com.georgesamuel.capitertask.ui
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,12 +33,12 @@ class MainActivity : AppCompatActivity() {
         ProductsAdapter(
             this@MainActivity,
             false,
-            { product, position -> addToCartListener(product, position) }
-        ) { listRefreshedWithZeroCounts() }
+            { product, position -> addToCartListener(product, position) },
+            { listRefreshedWithZeroCounts() }
+        ) { getNewData() }
     }
 
-    private val startNewActivityWithResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            result: ActivityResult ->
+    private val startNewActivityWithResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.let {
                 val refreshList = it.getBooleanExtra(EXTRA_REFRESH_HOME, false)
@@ -47,6 +47,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private var noPages = false
+    private var page = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,14 +66,23 @@ class MainActivity : AppCompatActivity() {
         observeViewModel()
     }
 
+    private fun getNewData() {
+        if(!noPages)
+            appViewModel.getProductsFromServer(++page)
+    }
+
     private fun observeViewModel(){
         appViewModel.apply {
             productsListLiveData.observe(this@MainActivity, {
-                productsAdapter.clear()
+                if(page == 1)
+                    productsAdapter.clear()
+
+                if(it.isEmpty())
+                    noPages = true
                 productsAdapter.addNewList(it)
             })
             successFullAddToCartLiveData.observe(this@MainActivity, {
-                if(it)
+                if (it)
                     productsAdapter.updateProductAt(this.addToCartProductPosition)
                 else
                     addToCartProductPosition = -1
@@ -104,7 +116,12 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.item_cart -> {
-                startNewActivityWithResult.launch(Intent(this@MainActivity, CartActivity::class.java))
+                startNewActivityWithResult.launch(
+                    Intent(
+                        this@MainActivity,
+                        CartActivity::class.java
+                    )
+                )
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -1,6 +1,7 @@
 package com.georgesamuel.capitertask.ui
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,8 @@ class ProductsAdapter(
     private val context: Context,
     private val isCartView: Boolean,
     private val addToCartListener: (ProductDetails, Int) -> Unit,
-    private val listRefreshedWithZeroCounts: (() -> Unit)?
+    private val listRefreshedWithZeroCounts: (() -> Unit)?,
+    private val getNewData: (() -> Unit)?
 ) : RecyclerView.Adapter<ProductsAdapter.ProductsViewHolder>() {
 
     private val list: MutableList<ProductDetails> = ArrayList()
@@ -33,12 +35,17 @@ class ProductsAdapter(
             context,
             list[position],
             position,
-            position == this.list.size - 1,
+            position == itemCount - 1,
             isCartView,
             setCountsZero,
             addToCartListener,
             listRefreshedWithZeroCounts
         )
+
+        Log.d("ProductsAdapter", position.toString())
+
+        if(position == itemCount - 1)
+            getNewData?.invoke()
     }
 
     override fun getItemCount(): Int = list.size
